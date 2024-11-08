@@ -182,7 +182,7 @@ const Home = () => {
         </Helmet>
 
         <h1 className="text-3xl font-bold mb-2">ERC-20 Token</h1>
-        <p className="text-gray-500 mb-6">Get Balance & Send Transactions</p>
+        <p className="text-gray-500 mb-6">Create Wallet, Get Balance & Send Transactions</p>
 
         <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
           <div className="mb-4">
