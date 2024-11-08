@@ -76,6 +76,7 @@ const Home = () => {
   ];
 
   const getTokenBalance = async () => {
+    setBalance(0);
     setErrorMessage("");
     if (!web3) return; // Ensure web3 is initialized
     const contract = new web3.eth.Contract(balanceOfABI, tokenContract);
