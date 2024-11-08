@@ -86,7 +86,6 @@ const Home = () => {
       setBalance(formattedResult);
       setErrorMessage(''); // Clear any previous error messages
     } catch (error) {
-      console.error("Error fetching balance:", error);
       setErrorMessage("Failed to fetch balance. " + error.message);
     }
   };
