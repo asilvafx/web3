@@ -82,7 +82,7 @@ const Home = () => {
     const contract = new web3.eth.Contract(balanceOfABI, tokenContract);
     try {
       const result = await contract.methods.balanceOf(tokenHolder).call();
-      const formattedResult = web3.utils.fromWei(result, "ether");
+      const formattedResult = parseFloat(web3.utils.fromWei(result, "ether")).toFixed(4); // Limit to 4 decimals
       setBalance(formattedResult);
       setErrorMessage(''); // Clear any previous error messages
     } catch (error) {
