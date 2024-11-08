@@ -159,7 +159,7 @@ const Home = () => {
 
   const createWallet = () => {
     if (!web3 && !tokenProvider) {
-      alert('Web3 failed! Please ensure you have a valid RPC provider, and try again later.');
+      alert('Please ensure you have a valid RPC provider, and try again.');
       return;
     }
     const account = web3.eth.accounts.create();
