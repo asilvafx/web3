@@ -1,18 +1,17 @@
-# Vite React Boilerplate
-
-A lightweight, production-ready boilerplate for React projects built on Vite. This setup includes essential dependencies for modern web development, such as Axios for API requests, i18n for internationalization, and React Router for route management. Includes Tailwind CSS for styling, ESLint for code quality, and support for environment variables.
+# Web3 Ethereum
+A comprehensive boilerplate for building decentralized applications (dApps) using Web3 technologies. This setup includes essential dependencies for blockchain development, such as Web3.js for interacting with the Ethereum blockchain, Infura for RPC nodes, and React. It also incorporates Tailwind CSS for styling, ESLint for code quality, and support for environment variables.
 
 ## Features
-- **React 18** with **Vite** for fast development
-- **Axios** for easy HTTP requests
-- **i18n** with i18next for multi-language support
-- **React Router** for route management
-- **Tailwind CSS** with Tailwind Merge for custom styling
+
+- **ERC-20** Get Token BalanceOf and Send Transactions
+- **Web3.js** for Ethereum blockchain interaction
+- **Infura.io** for blockchain RPC nodes 
+- **React + Vite + Tailwind CSS** for frontend 
 - **Environment configuration** via dotenv
 
 ## Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/asilvafx/vite-react-boilerplate.git
-   cd vite-react-boilerplate
+   git clone https://github.com/asilvafx/web3.git
+   cd web3
