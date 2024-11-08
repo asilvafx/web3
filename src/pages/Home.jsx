@@ -17,6 +17,7 @@ const Home = () => {
   const [holderSecretKey, setHolderSecretKey] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [transactionHash, setTransactionHash] = useState('');
   const [isMining, setIsMining] = useState(false); // New state for mining status
 
   useEffect(() => {
@@ -82,6 +83,7 @@ const Home = () => {
       setBalance(0);
       setSuccessMessage("");
       setErrorMessage("");
+      setTransactionHash("");
     }
 
     if (!web3) return; // Ensure web3 is initialized
@@ -103,6 +105,7 @@ const Home = () => {
     if (!web3) return;
     setSuccessMessage("");
     setErrorMessage("");
+    setTransactionHash("");
     setIsMining(true); // Set mining state to true
 
     const amountInWei = web3.utils.toWei(amountToSend, "ether");
@@ -132,10 +135,11 @@ const Home = () => {
           .once("transactionHash", (txhash) => {
             console.log(`Mining transaction ...`);
             console.log(`https://polygonscan.com/tx/${txhash}`);
+            setTransactionHash(`https://polygonscan.com/tx/${txhash}`);
           });
 
       console.log(`Mined in block ${receipt.blockNumber}`);
-      setSuccessMessage(`Transaction successful! Mined in block ${receipt.blockNumber}, https://polygonscan.com/tx/${txhash}`);
+      setSuccessMessage(`Transaction successful! Mined in block ${receipt.blockNumber}`);
       setShowModal(false);
       setDestinationAddress('');
       setAmountToSend('');
@@ -168,7 +172,7 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Contract:</label>
             <input
                 type="text"
-                value={tokenContract}
+                placeholder={tokenContract}
                 onChange={(e) => setTokenContract(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
@@ -178,7 +182,7 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Holder:</label>
             <input
                 type="text"
-                value={tokenHolder}
+                placeholder={tokenHolder}
                 onChange={(e) => setTokenHolder(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
@@ -188,7 +192,7 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Provider:</label>
             <input
                 type="text"
-                value={tokenProvider}
+                placeholder={tokenProvider}
                 onChange={(e) => setTokenProvider(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
@@ -213,7 +217,16 @@ const Home = () => {
           )}
 
           {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
-          {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
+          {successMessage && (
+              <>
+                <p className="text-green-500 mt-2">
+                  {successMessage}
+                </p>
+                <a className="text-color" href={transactionHash} target="_blank" rel="noopener noreferrer" aria-label="View Transaction">
+                  View Transaction
+                </a>
+              </>
+          )}
         </div>
 
         <h2 className="text-xl font-semibold mt-6">Balance:</h2>
