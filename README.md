@@ -3,7 +3,7 @@ A comprehensive boilerplate for building decentralized applications (dApps) usin
 
 ## Features
 
-- **ERC-20** Get Token BalanceOf and Send Transactions
+- **ERC-20** Create Wallet, Get Token BalanceOf and Send Transactions
 - **Web3.js** for Ethereum blockchain interaction
 - **Infura.io** for blockchain RPC nodes 
 - **React + Vite + Tailwind CSS** for frontend 
