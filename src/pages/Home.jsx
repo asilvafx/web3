@@ -144,12 +144,12 @@ const Home = () => {
       setDestinationAddress('');
       setAmountToSend('');
       setHolderSecretKey(''); // Clear the secret key after transaction
-      await getTokenBalance(false);
     } catch (error) {
       console.error("Transaction failed:", error);
       setErrorMessage("Transaction failed. Please check the console for more details.");
     } finally {
       setIsMining(false); // Reset mining state
+      await getTokenBalance(false);
     }
   };
 
