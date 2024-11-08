@@ -7,9 +7,9 @@ const Home = () => {
   const { t } = useTranslation();
   const [balance, setBalance] = useState(0);
   const [balanceFixed, setBalanceFixed] = useState(0);
-  const [tokenContract, setTokenContract] = useState("0x6B175474E89094C44Da98b954EedeAC495271d0F");
-  const [tokenHolder, setTokenHolder] = useState("0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8");
-  const [tokenProvider, setTokenProvider] = useState("https://mainnet.infura.io/v3/YOUR_API_KEY");
+  const [tokenContract, setTokenContract] = useState("");
+  const [tokenHolder, setTokenHolder] = useState("");
+  const [tokenProvider, setTokenProvider] = useState("");
   const [web3, setWeb3] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [destinationAddress, setDestinationAddress] = useState('');
@@ -18,7 +18,8 @@ const Home = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
-  const [isMining, setIsMining] = useState(false); // New state for mining status
+  const [isMining, setIsMining] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (tokenProvider) {
@@ -79,7 +80,7 @@ const Home = () => {
   ];
 
   const getTokenBalance = async (hideControls = true) => {
-    if(hideControls){
+    if (hideControls) {
       setBalance(0);
       setSuccessMessage("");
       setErrorMessage("");
@@ -96,6 +97,9 @@ const Home = () => {
       setBalance(formattedResult);
       setBalanceFixed(formattedResultFixed);
       setErrorMessage(''); // Clear any previous error messages
+
+      // Show the Send Transaction button
+      setIsConnected(true);
     } catch (error) {
       setErrorMessage("Failed to fetch balance. " + error.message);
     }
@@ -153,6 +157,19 @@ const Home = () => {
     }
   };
 
+  const createWallet = () => {
+    if (!web3 && !tokenProvider) {
+      alert('Web3 failed! Please ensure you have a valid RPC provider, and try again later.');
+      return;
+    }
+    const account = web3.eth.accounts.create();
+    setTokenHolder(account.address); // Set the token holder to the new account address
+    setHolderSecretKey(account.privateKey); // Set the holder secret key to the new account private key
+    alert("Account wallet created successfully!");
+    console.log("Public Address:", account.address);
+    console.log("Private Key:", account.privateKey);
+  };
+
   const isAmountValid = () => {
     return parseFloat(amountToSend) > 0 && parseFloat(amountToSend) <= parseFloat(balance);
   };
@@ -172,7 +189,8 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Contract:</label>
             <input
                 type="text"
-                placeholder={tokenContract}
+                value={tokenContract}
+                placeholder="0x6B175474E89094C44Da98b954EedeAC495271d0F"
                 onChange={(e) => setTokenContract(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
@@ -182,7 +200,8 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Holder:</label>
             <input
                 type="text"
-                placeholder={tokenHolder}
+                value={tokenHolder} // Set value to tokenHolder
+                placeholder="0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8" // Placeholder to show the current value
                 onChange={(e) => setTokenHolder(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
@@ -192,30 +211,33 @@ const Home = () => {
             <label className="block text-sm font-medium text-gray-700">Token Provider:</label>
             <input
                 type="text"
-                placeholder={tokenProvider}
+                value={tokenProvider}
+                placeholder="https://mainnet.infura.io/v3/YOUR_API_KEY"
                 onChange={(e) => setTokenProvider(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
-            <p className="text-sm text-blue-500 mt-1">
-            <a href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
-            &#10140; Infura RPC Endpoints
-            </a>
-            </p>
           </div>
 
           <button
-              onClick={getTokenBalance}
+              onClick={getTokenBalance }
               disabled={isMining}
               className={`w-full ${isMining ? 'bg-gray-400' : 'bg-blue-600'} text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200`}
           >
             {isMining ? 'Mining...' : 'Connect'}
           </button>
 
-          {balance > 0 && (
+          <button
+              onClick={createWallet}
+              className="mt-4 w-full bg-yellow-600 text-white font-semibold py-2 rounded-md hover:bg-yellow-700 transition duration-200"
+          >
+            Create Wallet
+          </button>
+
+          {isConnected && (
               <button
                   onClick={() => setShowModal(true)}
                   disabled={isMining}
-                  className={`mt-4 w-full ${isMining ? 'bg-gray-400' : 'bg-green-600'} text-white font-semibold py-2 rounded-md hover:bg-green-700 transition duration-200`}
+                  className={`mt-4 w-full ${balance>0 ? '' : 'opacity-50 pointer-events-none'}  ${isMining ? 'bg-gray-400' : 'bg-green-600'} text-white font-semibold py-2 rounded-md hover:bg-green-700 transition duration-200`}
               >
                 Send Transaction
               </button>
@@ -237,7 +259,7 @@ const Home = () => {
         <h2 className="text-xl font-semibold mt-6">Balance:</h2>
         <p className="text-lg text-gray-800">{balanceFixed}</p>
 
-        { showModal && (
+        {showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white rounded-lg p-6 w-80">
                 <h3 className="text-lg font-semibold mb-4">Send Transaction</h3>
@@ -246,6 +268,7 @@ const Home = () => {
                   <input
                       type="text"
                       value={destinationAddress}
+                      placeholder="0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8"
                       onChange={(e) => setDestinationAddress(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
                   />
@@ -256,6 +279,7 @@ const Home = () => {
                   <input
                       type="number"
                       value={amountToSend}
+                      placeholder="0.0000"
                       onChange={(e) => setAmountToSend(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
                   />
@@ -268,7 +292,8 @@ const Home = () => {
                   <label className="block text-sm font-medium text-gray-700">Wallet Secret Key:</label>
                   <input
                       type="text"
-                      value={holderSecretKey}
+                      value={holderSecretKey} // Set value to holderSecretKey
+                      placeholder="Wallet Secret Key" // Placeholder to show the current value
                       onChange={(e) => setHolderSecretKey(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
                   />
