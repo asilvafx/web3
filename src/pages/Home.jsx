@@ -6,6 +6,7 @@ import Web3 from 'web3';
 const Home = () => {
   const { t } = useTranslation();
   const [balance, setBalance] = useState(0);
+  const [balanceFixed, setBalanceFixed] = useState(0);
   const [tokenContract, setTokenContract] = useState("0x6B175474E89094C44Da98b954EedeAC495271d0F");
   const [tokenHolder, setTokenHolder] = useState("0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8");
   const [tokenProvider, setTokenProvider] = useState("https://mainnet.infura.io/v3/YOUR_API_KEY");
@@ -13,8 +14,10 @@ const Home = () => {
   const [showModal, setShowModal] = useState(false);
   const [destinationAddress, setDestinationAddress] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
-  const [holderSecretKey, setHolderSecretKey] = useState(''); // New state for secret key
+  const [holderSecretKey, setHolderSecretKey] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isMining, setIsMining] = useState(false); // New state for mining status
 
   useEffect(() => {
     if (tokenProvider) {
@@ -50,7 +53,6 @@ const Home = () => {
     },
   ];
 
-  // The ABI to send ERC20 Token transfers
   const transferABI = [
     {
       "constant": false,
@@ -75,15 +77,22 @@ const Home = () => {
     }
   ];
 
-  const getTokenBalance = async () => {
-    setBalance(0);
-    setErrorMessage("");
+  const getTokenBalance = async (hideControls = true) => {
+    if(hideControls){
+      setBalance(0);
+      setSuccessMessage("");
+      setErrorMessage("");
+    }
+
     if (!web3) return; // Ensure web3 is initialized
     const contract = new web3.eth.Contract(balanceOfABI, tokenContract);
     try {
       const result = await contract.methods.balanceOf(tokenHolder).call();
-      const formattedResult = parseFloat(web3.utils.fromWei(result, "ether")).toFixed(4); // Limit to 4 decimals
+      const formattedResult = parseFloat(web3.utils.fromWei(result, "ether"));
+      const formattedResultFixed = formattedResult.toFixed(4);
+
       setBalance(formattedResult);
+      setBalanceFixed(formattedResultFixed);
       setErrorMessage(''); // Clear any previous error messages
     } catch (error) {
       setErrorMessage("Failed to fetch balance. " + error.message);
@@ -92,52 +101,51 @@ const Home = () => {
 
   const handleSendTransaction = async () => {
     if (!web3) return;
+    setSuccessMessage("");
+    setErrorMessage("");
+    setIsMining(true); // Set mining state to true
 
     const amountInWei = web3.utils.toWei(amountToSend, "ether");
-    const accounts = await web3.eth.getAccounts();
 
     try {
       const gasPrice = await web3.eth.getGasPrice();
       const gasLimit = 200000;
 
-      // Use the input secret key
-      const walletSecret = holderSecretKey;
-
-      // Creating a signing account from a private key
-      const signer = web3.eth.accounts.privateKeyToAccount(walletSecret);
+      const signer = web3.eth.accounts.privateKeyToAccount(holderSecretKey);
       web3.eth.accounts.wallet.add(signer);
 
-      const web3contract = new web3.eth.Contract(transferABI, tokenContract, { from: signer.address });
+      const web3contract = new web3.eth.Contract(transferABI, tokenContract, { from: tokenHolder });
 
       const params = {
         from: tokenHolder,
-        to: destinationAddress,
+        to: tokenContract,
         nonce: await web3.eth.getTransactionCount(tokenHolder),
         value: '0x00',
-        data: web3contract.methods.transfer(tokenHolder, amountInWei).encodeABI(),
+        data: web3contract.methods.transfer(destinationAddress, amountInWei).encodeABI(),
         gasPrice: web3.utils.toHex(gasPrice),
         gasLimit: web3.utils.toHex(gasLimit),
       };
 
-      const signedTx = await web3.eth.accounts.signTransaction(params, walletSecret );
+      const signedTx = await web3.eth.accounts.signTransaction(params, holderSecretKey);
 
       const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
           .once("transactionHash", (txhash) => {
             console.log(`Mining transaction ...`);
             console.log(`https://polygonscan.com/tx/${txhash}`);
-            alert(txhash);
           });
-      // The transaction is now on chain!
-      console.log(`Mined in block ${receipt.blockNumber}`);
 
-      alert('Transaction successful!');
+      console.log(`Mined in block ${receipt.blockNumber}`);
+      setSuccessMessage(`Transaction successful! Mined in block ${receipt.blockNumber}`);
       setShowModal(false);
       setDestinationAddress('');
       setAmountToSend('');
       setHolderSecretKey(''); // Clear the secret key after transaction
+      await getTokenBalance(false);
     } catch (error) {
       console.error("Transaction failed:", error);
       setErrorMessage("Transaction failed. Please check the console for more details.");
+    } finally {
+      setIsMining(false); // Reset mining state
     }
   };
 
@@ -188,27 +196,30 @@ const Home = () => {
 
           <button
               onClick={getTokenBalance}
-              className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200"
+              disabled={isMining}
+              className={`w-full ${isMining ? 'bg-gray-400' : 'bg-blue-600'} text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200`}
           >
-            Connect
+            {isMining ? 'Mining...' : 'Connect'}
           </button>
 
           {balance > 0 && (
               <button
                   onClick={() => setShowModal(true)}
-                  className="mt-4 w-full bg-green-600 text-white font-semibold py-2 rounded-md hover:bg-green-700 transition duration-200"
+                  disabled={isMining}
+                  className={`mt-4 w-full ${isMining ? 'bg-gray-400' : 'bg-green-600'} text-white font-semibold py-2 rounded-md hover:bg-green-700 transition duration-200`}
               >
                 Send Transaction
               </button>
           )}
 
           {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+          {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
         </div>
 
         <h2 className="text-xl font-semibold mt-6">Balance:</h2>
-        <p className="text-lg text-gray-800">{balance}</p>
+        <p className="text-lg text-gray-800">{balanceFixed}</p>
 
-        {showModal && (
+        { showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white rounded-lg p-6 w-80">
                 <h3 className="text-lg font-semibold mb-4">Send Transaction</h3>
@@ -226,7 +237,7 @@ const Home = () => {
                   <label className="block text-sm font-medium text-gray-700">Amount to Send:</label>
                   <input
                       type="number"
-                      value={ amountToSend}
+                      value={amountToSend}
                       onChange={(e) => setAmountToSend(e.target.value)}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
                   />
@@ -247,10 +258,10 @@ const Home = () => {
 
                 <button
                     onClick={handleSendTransaction}
-                    disabled={!isAmountValid()}
-                    className={`w-full ${isAmountValid() ? 'bg-blue-600' : 'bg-gray-400'} text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200`}
+                    disabled={!isAmountValid() || isMining}
+                    className={`w-full ${!isAmountValid() || isMining ? 'bg-gray-400' : 'bg-blue-600'} text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200`}
                 >
-                  Send
+                  {isMining ? 'Mining...' : 'Send'}
                 </button>
                 <button
                     onClick={() => setShowModal(false)}
