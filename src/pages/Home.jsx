@@ -196,6 +196,11 @@ const Home = () => {
                 onChange={(e) => setTokenProvider(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
+            <p className="text-sm text-blue-500">
+            <a href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
+              Infura RPC Endpoints
+            </a>
+            </p>
           </div>
 
           <button
