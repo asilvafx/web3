@@ -28,7 +28,8 @@
     "save-dev": "^0.0.1-security",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "vanilla-cookieconsent": "^3.0.1"
+    "vanilla-cookieconsent": "^3.0.1",
+    "web3": "^4.15.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.12",
