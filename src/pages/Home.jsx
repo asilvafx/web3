@@ -135,7 +135,7 @@ const Home = () => {
           });
 
       console.log(`Mined in block ${receipt.blockNumber}`);
-      setSuccessMessage(`Transaction successful! Mined in block ${receipt.blockNumber}. https://polygonscan.com/tx/${txhash}`);
+      setSuccessMessage(`Transaction successful! Mined in block ${receipt.blockNumber}, https://polygonscan.com/tx/${txhash}`);
       setShowModal(false);
       setDestinationAddress('');
       setAmountToSend('');
