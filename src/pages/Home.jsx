@@ -217,7 +217,7 @@ const Home = () => {
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
             <p>
-            <a className="text-blue-500 mt-1" href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
+            <a className="text-blue-500 mt-2" href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
               ➜ Infura RPC Endpoints
             </a>
             </p>
