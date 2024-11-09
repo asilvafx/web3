@@ -214,10 +214,10 @@ const Home = () => {
                 value={tokenProvider}
                 placeholder="https://mainnet.infura.io/v3/YOUR_API_KEY"
                 onChange={(e) => setTokenProvider(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
+                className="mt-1 mb-2 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
             <p>
-            <a className="text-blue-500 mt-2" href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
+            <a className="text-blue-500" href="https://docs.infura.io/api/network-endpoints" target="_blank" rel="noopener noreferrer" aria-label="Infura RPC Endpoints">
               ➜ Infura RPC Endpoints
             </a>
             </p>
