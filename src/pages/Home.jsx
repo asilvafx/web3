@@ -208,7 +208,7 @@ const Home = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Token Provider:</label>
+            <label className="block text-sm font-medium text-gray-700">RPC Provider:</label>
             <input
                 type="text"
                 value={tokenProvider}
