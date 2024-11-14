@@ -92,8 +92,8 @@
     background-color: var(--alt-color) !important;
   } 
   button, .btn, .button { 
-    background-color: var(--alt-color) !important; 
-    border-color: var(--border-color) !important;
+    background-color: var(--alt-color); 
+    border-color: var(--border-color);
     color: var(--background-color);
     fill: var(--background-color);
   }
